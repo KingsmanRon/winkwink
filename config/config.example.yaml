@@ -1,0 +1,201 @@
+# Job Crawler Configuration
+# Copy this file to config.yaml and customize for your needs
+
+# Salary Requirements (USD)
+salary_minimum_monthly_usd: 15900
+salary_minimum_yearly_usd: 190800
+
+# Work Arrangement Preferences
+work_arrangement:
+  - remote
+  - hybrid
+  # - on-site
+travel_willingness: true
+relocation_open: true
+
+# Geographic Preferences
+geographic_preferences:
+  - global
+  - EU
+  - US
+  - UK
+  - UAE
+  - Singapore
+  - Japan
+
+# Company Categories and Targets
+company_categories:
+  fintech:
+    enabled: true
+    priority: high
+    targets:
+      - Stripe
+      - Plaid
+      - Revolut
+      - Wise
+      - Adyen
+      - Block/Square
+      - Coinbase
+      - Kraken
+      - Robinhood
+      - Affirm
+      - Klarna
+      - Nubank
+      - Checkout.com
+      - Rapyd
+      - Marqeta
+
+  quant_trading:
+    enabled: true
+    priority: high
+    targets:
+      - Jane Street
+      - Two Sigma
+      - Citadel
+      - Citadel Securities
+      - DE Shaw
+      - Jump Trading
+      - Hudson River Trading
+      - Optiver
+      - IMC Trading
+      - Virtu Financial
+      - Tower Research
+      - SIG
+      - Akuna Capital
+      - DRW
+      - Five Rings Capital
+
+  ai_companies:
+    enabled: true
+    priority: high
+    targets:
+      - Anthropic
+      - OpenAI
+      - NVIDIA
+      - DeepMind
+      - Cohere
+      - Databricks
+      - Scale AI
+      - Hugging Face
+      - Stability AI
+      - Inflection AI
+      - Mistral AI
+      - Perplexity
+      - Runway
+      - Character.ai
+      - Anyscale
+      - Modal
+      - Replicate
+      - Together AI
+
+  big_tech:
+    enabled: true
+    priority: medium
+    targets:
+      - Google
+      - Microsoft
+      - Amazon/AWS
+      - Meta
+      - Apple
+      - Netflix
+      - Uber
+      - Airbnb
+      - Spotify
+      - Salesforce
+
+  cloud_vendors:
+    enabled: true
+    priority: high
+    targets:
+      - AWS
+      - Google Cloud
+      - Microsoft Azure
+      - HashiCorp
+      - Snowflake
+      - Datadog
+      - MongoDB
+      - Confluent
+      - Elastic
+      - Cloudflare
+      - Vercel
+      - Supabase
+      - PlanetScale
+
+  enterprise_consulting:
+    enabled: true
+    priority: low
+    targets:
+      - Deloitte
+      - Accenture
+      - McKinsey Digital
+      - BCG Gamma
+      - Slalom
+      - Thoughtworks
+      - EPAM
+
+# Role Types to Search
+role_types:
+  core_infrastructure:
+    - Cloud Architect
+    - Solutions Architect
+    - Principal Engineer
+    - Staff Engineer
+    - Platform Engineer
+    - Site Reliability Engineer (SRE)
+    - DevOps Engineer
+    - Infrastructure Engineer
+    - Cloud Engineer
+
+  ai_infrastructure_willing_to_learn:
+    - ML Platform Engineer
+    - MLOps Engineer
+    - AI Infrastructure Engineer
+    - Data Platform Engineer
+    - ML Systems Engineer
+    - GPU/Compute Infrastructure Engineer
+    - AI/ML Solutions Architect
+    - Machine Learning Engineer - Infrastructure
+    - Deep Learning Infrastructure Engineer
+    - LLM Infrastructure Engineer
+    - Model Serving Engineer
+
+# Learning and Growth
+learning_openness:
+  willing_to_upskill: true
+  target_domains:
+    - AI/ML infrastructure
+    - MLOps
+    - LLM deployment and serving
+    - GPU cluster management
+    - Distributed training systems
+    - Feature stores
+    - Model monitoring
+  existing_transferable_skills:
+    - multi-cloud architecture
+    - infrastructure-as-code
+    - Kubernetes
+    - containerization
+    - enterprise architecture
+    - high-availability systems
+    - security and compliance
+
+# Search Parameters
+excluded_companies: []
+job_recency_days: 30
+match_threshold_percent: 70
+include_stretch_roles: true
+stretch_threshold_percent: 60
+
+# Job Sources to Crawl
+job_sources:
+  - linkedin
+  - indeed
+  - remoteok
+  - weworkremotely
+  - wellfound
+  # - levelsfyi
+
+# API Keys (optional, for enhanced features)
+# api_keys:
+#   anthropic: ""  # For Claude API enhanced interview prep
+#   linkedin: ""   # For LinkedIn API access
