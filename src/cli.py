@@ -511,6 +511,147 @@ def cleanup(ctx, days):
     click.echo(f"Deleted {deleted} old jobs")
 
 
+@cli.command()
+@click.option("--cv", type=click.Path(exists=True), help="Path to CV file for matching")
+@click.option("--companies", "-c", multiple=True, help="Specific companies to crawl")
+@click.option("--category", type=click.Choice(["ai", "quant", "fintech", "bigtech", "all"]), default="all", help="Company category")
+@click.option("--keywords", "-k", multiple=True, help="Filter by job title keywords")
+@click.pass_context
+def targets(ctx, cv, companies, category, keywords):
+    """Crawl top target companies directly via their APIs.
+
+    This uses Greenhouse/Lever/Ashby APIs for reliable job fetching.
+
+    Examples:
+        jobcrawler targets --category ai --cv resume.pdf
+        jobcrawler targets -c anthropic -c stripe -c databricks
+        jobcrawler targets --category quant -k "infrastructure" -k "platform"
+    """
+    from .database import JobDatabase
+    from .crawler.company_direct import get_company_crawler, GreenhouseCrawler, LeverCrawler, AshbyCrawler
+    from .cv_parser import CVParser
+    from .matcher import JobMatcher, MatchConfig
+
+    config = ctx.obj["config"]
+
+    # Define target companies by category
+    target_companies = {
+        "ai": [
+            "anthropic", "openai", "scale_ai", "cohere", "anyscale",
+            "modal", "replicate", "together_ai", "perplexity", "mistral",
+            "databricks", "hugging_face"
+        ],
+        "quant": [
+            "citadel", "two_sigma", "jane_street", "jump_trading",
+            "hudson_river", "optiver", "drw", "imc_trading"
+        ],
+        "fintech": [
+            "stripe", "coinbase", "plaid", "ramp", "brex",
+            "affirm", "kraken", "revolut", "block"
+        ],
+        "bigtech": [
+            "netflix", "airbnb", "uber", "pinterest", "doordash",
+            "snowflake", "roblox", "meta"
+        ]
+    }
+
+    # Determine which companies to crawl
+    companies_to_crawl = []
+    if companies:
+        companies_to_crawl = list(companies)
+    elif category == "all":
+        for cat_companies in target_companies.values():
+            companies_to_crawl.extend(cat_companies)
+    else:
+        companies_to_crawl = target_companies.get(category, [])
+
+    if not companies_to_crawl:
+        click.echo("No companies specified. Use --companies or --category")
+        return
+
+    click.echo(f"Crawling {len(companies_to_crawl)} target companies...")
+
+    # Parse CV if provided
+    profile = None
+    if cv:
+        click.echo(f"Parsing CV: {cv}")
+        parser = CVParser()
+        profile = parser.parse(cv)
+        click.echo(f"  Candidate: {profile.name or 'Unknown'}")
+
+    # Initialize database
+    db = JobDatabase()
+
+    all_jobs = []
+    successful = 0
+    failed = 0
+
+    async def crawl_company(company_key):
+        crawler = get_company_crawler(company_key)
+        if not crawler:
+            return company_key, []
+
+        jobs = []
+        try:
+            kw_list = list(keywords) if keywords else None
+            async for job in crawler.search_jobs(keywords=kw_list):
+                jobs.append(job)
+        except Exception as e:
+            logger.debug(f"Error crawling {company_key}: {e}")
+        finally:
+            await crawler.close()
+
+        return company_key, jobs
+
+    async def crawl_all():
+        nonlocal successful, failed
+        import asyncio
+
+        for company in companies_to_crawl:
+            company_key, jobs = await crawl_company(company)
+            if jobs:
+                click.echo(f"  ✓ {company}: {len(jobs)} jobs")
+                all_jobs.extend(jobs)
+                successful += 1
+            else:
+                click.echo(f"  ✗ {company}: no jobs or API unavailable")
+                failed += 1
+
+    import asyncio
+    asyncio.run(crawl_all())
+
+    click.echo(f"\nCrawled {len(all_jobs)} total jobs from {successful} companies ({failed} unavailable)")
+
+    if all_jobs:
+        # Save to database
+        result = db.save_jobs(all_jobs)
+        click.echo(f"Saved {result['inserted']} new, updated {result['updated']} existing")
+
+        # Match if CV provided
+        if profile:
+            click.echo("\nMatching jobs against profile...")
+            match_config = MatchConfig()
+            if config.get("salary_minimum_yearly_usd"):
+                match_config.min_salary_yearly = config["salary_minimum_yearly_usd"]
+
+            matcher = JobMatcher(match_config)
+            results = matcher.batch_match(all_jobs, profile)
+
+            strong = sum(1 for _, s in results if s.tier == "strong")
+            good = sum(1 for _, s in results if s.tier == "good")
+            stretch = sum(1 for _, s in results if s.tier == "stretch")
+
+            click.echo(f"  Strong matches: {strong}")
+            click.echo(f"  Good matches: {good}")
+            click.echo(f"  Stretch roles: {stretch}")
+
+            # Update scores in database
+            for job, score in results:
+                db.update_match_score(job.job_id, score.total)
+
+    click.echo("\nDone! Run 'jobcrawler match' to see results.")
+
+
 def main():
     """Main entry point."""
     cli(obj={})

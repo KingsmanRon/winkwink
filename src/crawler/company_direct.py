@@ -528,6 +528,104 @@ class CompanyDirectCrawler(BaseCrawler):
         return None
 
 
+class AshbyCrawler(BaseCrawler):
+    """Crawler for Ashby job boards (used by Perplexity, Mistral, etc.)."""
+
+    def __init__(self, company_name: str, ashby_id: str, config: Optional[CrawlConfig] = None):
+        super().__init__(config or CrawlConfig(rate_limit=2.0))
+        self.company_name = company_name
+        self.ashby_id = ashby_id
+
+    @property
+    def source_name(self) -> str:
+        return f"ashby_{self.company_name}"
+
+    @property
+    def base_url(self) -> str:
+        return f"https://jobs.ashbyhq.com/{self.ashby_id}"
+
+    @property
+    def api_url(self) -> str:
+        return f"https://api.ashbyhq.com/posting-api/job-board/{self.ashby_id}"
+
+    async def search_jobs(
+        self,
+        keywords: Optional[List[str]] = None,
+        **kwargs
+    ) -> AsyncGenerator[JobPosting, None]:
+        """Fetch all jobs from Ashby board."""
+        json_data = await self.fetch_json(self.api_url)
+
+        if not json_data:
+            logger.warning(f"Failed to fetch Ashby jobs for {self.company_name}")
+            return
+
+        jobs = json_data.get("jobs", [])
+
+        for job_data in jobs:
+            job = self._parse_job(job_data)
+            if job:
+                if keywords:
+                    title_lower = job.title.lower()
+                    if not any(kw.lower() in title_lower for kw in keywords):
+                        continue
+                yield job
+
+    def _parse_job(self, data: Dict[str, Any]) -> Optional[JobPosting]:
+        """Parse job from Ashby API response."""
+        title = data.get("title", "")
+        if not title:
+            return None
+
+        job_id = data.get("id", "")
+
+        # Location
+        location = data.get("location", "")
+        if isinstance(location, dict):
+            location = location.get("name", "")
+
+        # Department
+        department = data.get("department", "")
+
+        # Employment type
+        employment_type = data.get("employmentType", "")
+
+        # URL
+        job_url = data.get("jobUrl", f"{self.base_url}/{job_id}")
+
+        # Posted date
+        published_at = data.get("publishedAt", "")
+
+        # Remote detection
+        remote_policy = ""
+        location_lower = str(location).lower()
+        if "remote" in location_lower:
+            remote_policy = "remote"
+        elif "hybrid" in location_lower:
+            remote_policy = "hybrid"
+
+        return JobPosting(
+            job_id=str(job_id),
+            title=title,
+            company=self.company_name,
+            location=location,
+            remote_policy=remote_policy,
+            application_url=job_url,
+            posting_date=published_at,
+            source=self.source_name,
+            crawled_at=datetime.now().isoformat(),
+            company_type=self.classify_company_type(self.company_name)
+        )
+
+    async def parse_job_listing(self, html: str, url: str) -> List[JobPosting]:
+        """Not used for API-based crawler."""
+        return []
+
+    async def parse_job_detail(self, html: str, url: str) -> Optional[JobPosting]:
+        """Not used for API-based crawler."""
+        return None
+
+
 def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) -> Optional[BaseCrawler]:
     """
     Get appropriate crawler for a company.
@@ -539,18 +637,65 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
     Returns:
         Appropriate crawler instance or None
     """
-    company_key = company_key.lower().replace(" ", "_")
+    company_key = company_key.lower().replace(" ", "_").replace("-", "_")
 
-    # Known Greenhouse boards
+    # Known Greenhouse boards - Top 50 high-paying companies
     greenhouse_boards = {
-        "affirm": ("Affirm", "affirm"),
+        # AI Labs
         "anthropic": ("Anthropic", "anthropic"),
+        "openai": ("OpenAI", "openai"),
+        "scale_ai": ("Scale AI", "scaleai"),
+        "cohere": ("Cohere", "cohere"),
+        "hugging_face": ("Hugging Face", "huggingface"),
+
+        # AI Compute Infrastructure
+        "anyscale": ("Anyscale", "anyscale"),
+        "modal": ("Modal", "modal"),
+        "replicate": ("Replicate", "replicate"),
+        "together_ai": ("Together AI", "togetherai"),
+        "coreweave": ("CoreWeave", "coreweave"),
+        "lambda_labs": ("Lambda Labs", "lambda"),
+
+        # Fintech
+        "stripe": ("Stripe", "stripe"),
+        "coinbase": ("Coinbase", "coinbase"),
+        "plaid": ("Plaid", "plaid"),
+        "ramp": ("Ramp", "ramp"),
+        "brex": ("Brex", "brex"),
+        "affirm": ("Affirm", "affirm"),
+        "kraken": ("Kraken", "kraken"),
+
+        # Big Tech
+        "databricks": ("Databricks", "databricks"),
+        "airbnb": ("Airbnb", "airbnb"),
+        "pinterest": ("Pinterest", "pinterest"),
+        "doordash": ("DoorDash", "doordash"),
+        "uber": ("Uber", "uber"),
+        "snowflake": ("Snowflake", "snowflake"),
+
+        # Quant (some use Greenhouse)
+        "citadel": ("Citadel", "citadel"),
+        "two_sigma": ("Two Sigma", "twosigma"),
     }
 
     # Known Lever boards
     lever_boards = {
-        "cohere": ("Cohere", "cohere"),
+        "netflix": ("Netflix", "netflix"),
+        "roblox": ("Roblox", "roblox"),
         "klarna": ("Klarna", "klarna"),
+        "revolut": ("Revolut", "revolut"),
+        "block": ("Block", "block"),
+        "meta": ("Meta", "meta"),
+    }
+
+    # Known Ashby boards (popular with AI startups)
+    ashby_boards = {
+        "perplexity": ("Perplexity AI", "perplexity"),
+        "perplexity_ai": ("Perplexity AI", "perplexity"),
+        "mistral": ("Mistral AI", "mistralai"),
+        "mistral_ai": ("Mistral AI", "mistralai"),
+        "character_ai": ("Character.ai", "characterai"),
+        "midjourney": ("Midjourney", "midjourney"),
     }
 
     if company_key in greenhouse_boards:
@@ -560,6 +705,10 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
     if company_key in lever_boards:
         name, lever_id = lever_boards[company_key]
         return LeverCrawler(name, lever_id, config)
+
+    if company_key in ashby_boards:
+        name, ashby_id = ashby_boards[company_key]
+        return AshbyCrawler(name, ashby_id, config)
 
     if company_key in COMPANY_CAREER_URLS:
         return CompanyDirectCrawler(
