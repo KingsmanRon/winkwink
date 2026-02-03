@@ -626,6 +626,41 @@ class AshbyCrawler(BaseCrawler):
         return None
 
 
+# Remote-first company boards (for international candidates)
+REMOTE_FIRST_GREENHOUSE_BOARDS = {
+    "gitlab": ("GitLab", "gitlab"),
+    "grafana_labs": ("Grafana Labs", "grafanalabs"),
+    "zapier": ("Zapier", "zapier"),
+    "dbt_labs": ("dbt Labs", "dbtlabsinc"),
+    "fly_io": ("Fly.io", "fly"),
+    "planetscale": ("PlanetScale", "planetscale"),
+    "sourcegraph": ("Sourcegraph", "sourcegraph"),
+    "linear": ("Linear", "linear"),
+    "postman": ("Postman", "postman"),
+    "airbyte": ("Airbyte", "airbyte"),
+    "mux": ("Mux", "mux"),
+    "retool": ("Retool", "retool"),
+    "webflow": ("Webflow", "webflow"),
+    "notion": ("Notion", "notion"),
+    "airtable": ("Airtable", "airtable"),
+}
+
+REMOTE_FIRST_LEVER_BOARDS = {
+    "automattic": ("Automattic", "automattic"),
+    "auth0": ("Auth0/Okta", "auth0"),
+    "hotjar": ("Hotjar", "hotjar"),
+    "loom": ("Loom", "loom"),
+    "remote_com": ("Remote.com", "remotecom"),
+    "deel": ("Deel", "deel"),
+    "oyster": ("Oyster HR", "oyster"),
+}
+
+REMOTE_FIRST_ASHBY_BOARDS = {
+    "cal_com": ("Cal.com", "calcom"),
+    "deno": ("Deno", "deno"),
+}
+
+
 def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) -> Optional[BaseCrawler]:
     """
     Get appropriate crawler for a company.
@@ -730,6 +765,19 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
         name, ashby_id = ashby_boards[company_key]
         return AshbyCrawler(name, ashby_id, config)
 
+    # Check remote-first boards
+    if company_key in REMOTE_FIRST_GREENHOUSE_BOARDS:
+        name, token = REMOTE_FIRST_GREENHOUSE_BOARDS[company_key]
+        return GreenhouseCrawler(name, token, config)
+
+    if company_key in REMOTE_FIRST_LEVER_BOARDS:
+        name, lever_id = REMOTE_FIRST_LEVER_BOARDS[company_key]
+        return LeverCrawler(name, lever_id, config)
+
+    if company_key in REMOTE_FIRST_ASHBY_BOARDS:
+        name, ashby_id = REMOTE_FIRST_ASHBY_BOARDS[company_key]
+        return AshbyCrawler(name, ashby_id, config)
+
     if company_key in COMPANY_CAREER_URLS:
         return CompanyDirectCrawler(
             company_key.replace("_", " ").title(),
@@ -738,3 +786,12 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
         )
 
     return None
+
+
+def get_remote_first_companies() -> List[str]:
+    """Get list of all remote-first company keys."""
+    companies = []
+    companies.extend(REMOTE_FIRST_GREENHOUSE_BOARDS.keys())
+    companies.extend(REMOTE_FIRST_LEVER_BOARDS.keys())
+    companies.extend(REMOTE_FIRST_ASHBY_BOARDS.keys())
+    return companies

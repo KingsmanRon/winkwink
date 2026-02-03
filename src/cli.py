@@ -182,12 +182,16 @@ def crawl(ctx, cv, keywords, sources, location, remote_only, companies, max_jobs
 @click.option("--cv", type=click.Path(exists=True), required=True, help="Path to CV file")
 @click.option("--threshold", "-t", default=60, help="Minimum match score threshold")
 @click.option("--limit", default=50, help="Maximum results to show")
+@click.option("--exclude-blockers/--include-blockers", default=True, help="Exclude jobs requiring clearance/citizenship")
+@click.option("--exclude-inaccessible", is_flag=True, help="Exclude location-inaccessible jobs")
+@click.option("--location", "-l", default="", help="Your location (e.g., 'South Africa', 'EU', 'US')")
 @click.pass_context
-def match(ctx, cv, threshold, limit):
+def match(ctx, cv, threshold, limit, exclude_blockers, exclude_inaccessible, location):
     """Match stored jobs against candidate profile.
 
     Example:
         jobcrawler match --cv resume.pdf --threshold 70
+        jobcrawler match --cv resume.pdf --exclude-blockers --location "South Africa"
     """
     from .database import JobDatabase
     from .cv_parser import CVParser
@@ -203,6 +207,8 @@ def match(ctx, cv, threshold, limit):
     click.echo(f"Title: {profile.current_title or 'Not detected'}")
     click.echo(f"Years Experience: {profile.years_experience}")
     click.echo(f"Certifications: {len(profile.certifications)}")
+    if location:
+        click.echo(f"Location: {location}")
     click.echo("")
 
     # Load jobs from database
@@ -214,9 +220,14 @@ def match(ctx, cv, threshold, limit):
         return
 
     click.echo(f"Matching against {len(jobs)} jobs...")
+    if exclude_blockers:
+        click.echo("  (Filtering out jobs requiring clearance/citizenship)")
 
     # Configure matcher
     match_config = MatchConfig(stretch_threshold=threshold)
+    match_config.exclude_blockers = exclude_blockers
+    match_config.candidate_location = location
+
     if config.get("salary_minimum_yearly_usd"):
         match_config.min_salary_yearly = config["salary_minimum_yearly_usd"]
 
@@ -228,7 +239,12 @@ def match(ctx, cv, threshold, limit):
                 match_config.company_priorities[company.lower()] = priority
 
     matcher = JobMatcher(match_config)
-    results = matcher.batch_match(jobs, profile, min_score=threshold)
+    results = matcher.batch_match(
+        jobs, profile,
+        min_score=threshold,
+        exclude_blocked=exclude_blockers,
+        exclude_inaccessible=exclude_inaccessible
+    )
 
     if not results:
         click.echo(f"No jobs found above {threshold}% threshold.")
@@ -238,8 +254,16 @@ def match(ctx, cv, threshold, limit):
     click.echo(f"\nFound {len(results)} matching jobs:\n")
 
     for i, (job, score) in enumerate(results[:limit], 1):
-        tier_emoji = {"strong": "🔥", "good": "✅", "stretch": "📈"}.get(score.tier, "")
+        tier_emoji = {
+            "strong": "🔥",
+            "good": "✅",
+            "stretch": "📈",
+            "blocked": "⛔",
+            "inaccessible": "🌍"
+        }.get(score.tier, "")
         click.echo(f"{i}. {tier_emoji} [{score.total:.0f}%] {job.title} @ {job.company}")
+        if score.blockers:
+            click.echo(f"   ⚠️ Blockers: {', '.join(score.blockers)}")
         if job.location:
             click.echo(f"   Location: {job.location}")
         if job.salary_max:
@@ -255,7 +279,11 @@ def match(ctx, cv, threshold, limit):
     strong = sum(1 for _, s in results if s.tier == "strong")
     good = sum(1 for _, s in results if s.tier == "good")
     stretch = sum(1 for _, s in results if s.tier == "stretch")
+    blocked = sum(1 for _, s in results if s.tier == "blocked")
+    inaccessible = sum(1 for _, s in results if s.tier == "inaccessible")
     click.echo(f"Total: {len(results)} | Strong: {strong} | Good: {good} | Stretch: {stretch}")
+    if blocked > 0 or inaccessible > 0:
+        click.echo(f"Filtered: {blocked} blocked (clearance/citizenship), {inaccessible} inaccessible (location)")
 
 
 @cli.command()
@@ -514,10 +542,12 @@ def cleanup(ctx, days):
 @cli.command()
 @click.option("--cv", type=click.Path(exists=True), help="Path to CV file for matching")
 @click.option("--companies", "-c", multiple=True, help="Specific companies to crawl")
-@click.option("--category", type=click.Choice(["ai", "quant", "fintech", "bigtech", "infra", "all"]), default="all", help="Company category")
+@click.option("--category", type=click.Choice(["ai", "quant", "fintech", "bigtech", "infra", "remote_first", "all"]), default="all", help="Company category")
 @click.option("--keywords", "-k", multiple=True, help="Filter by job title keywords")
+@click.option("--exclude-blockers/--include-blockers", default=True, help="Exclude jobs requiring clearance/citizenship")
+@click.option("--location", "-l", default="", help="Your location for accessibility scoring")
 @click.pass_context
-def targets(ctx, cv, companies, category, keywords):
+def targets(ctx, cv, companies, category, keywords, exclude_blockers, location):
     """Crawl top target companies directly via their APIs.
 
     This uses Greenhouse/Lever/Ashby APIs for reliable job fetching.
@@ -526,9 +556,10 @@ def targets(ctx, cv, companies, category, keywords):
         jobcrawler targets --category ai --cv resume.pdf
         jobcrawler targets -c anthropic -c stripe -c databricks
         jobcrawler targets --category quant -k "infrastructure" -k "platform"
+        jobcrawler targets --category remote_first --cv resume.pdf  # Best for international candidates
     """
     from .database import JobDatabase
-    from .crawler.company_direct import get_company_crawler, GreenhouseCrawler, LeverCrawler, AshbyCrawler
+    from .crawler.company_direct import get_company_crawler, get_remote_first_companies, GreenhouseCrawler, LeverCrawler, AshbyCrawler
     from .cv_parser import CVParser
     from .matcher import JobMatcher, MatchConfig
 
@@ -563,7 +594,8 @@ def targets(ctx, cv, companies, category, keywords):
             # Infrastructure-as-Product companies
             "hashicorp", "cloudflare", "confluent", "elastic",
             "mongodb", "datadog", "vercel", "supabase"
-        ]
+        ],
+        "remote_first": get_remote_first_companies()  # International-friendly companies
     }
 
     # Determine which companies to crawl
@@ -641,20 +673,32 @@ def targets(ctx, cv, companies, category, keywords):
         # Match if CV provided
         if profile:
             click.echo("\nMatching jobs against profile...")
+            if exclude_blockers:
+                click.echo("  (Filtering out jobs requiring clearance/citizenship)")
+
             match_config = MatchConfig()
+            match_config.exclude_blockers = exclude_blockers
+            match_config.candidate_location = location
+
             if config.get("salary_minimum_yearly_usd"):
                 match_config.min_salary_yearly = config["salary_minimum_yearly_usd"]
 
             matcher = JobMatcher(match_config)
-            results = matcher.batch_match(all_jobs, profile)
+            results = matcher.batch_match(
+                all_jobs, profile,
+                exclude_blocked=exclude_blockers
+            )
 
             strong = sum(1 for _, s in results if s.tier == "strong")
             good = sum(1 for _, s in results if s.tier == "good")
             stretch = sum(1 for _, s in results if s.tier == "stretch")
+            blocked = sum(1 for _, s in results if s.tier == "blocked")
 
             click.echo(f"  Strong matches: {strong}")
             click.echo(f"  Good matches: {good}")
             click.echo(f"  Stretch roles: {stretch}")
+            if blocked > 0:
+                click.echo(f"  Blocked (clearance/citizenship): {blocked}")
 
             # Update scores in database
             for job, score in results:
