@@ -641,22 +641,23 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
 
     # Known Greenhouse boards - Top 50 high-paying companies
     greenhouse_boards = {
-        # AI Labs
+        # AI Labs & Research
         "anthropic": ("Anthropic", "anthropic"),
         "openai": ("OpenAI", "openai"),
         "scale_ai": ("Scale AI", "scaleai"),
         "cohere": ("Cohere", "cohere"),
         "hugging_face": ("Hugging Face", "huggingface"),
 
-        # AI Compute Infrastructure
+        # AI Compute Infrastructure (HOT CATEGORY)
         "anyscale": ("Anyscale", "anyscale"),
         "modal": ("Modal", "modal"),
         "replicate": ("Replicate", "replicate"),
         "together_ai": ("Together AI", "togetherai"),
         "coreweave": ("CoreWeave", "coreweave"),
-        "lambda_labs": ("Lambda Labs", "lambda"),
+        "lambda_labs": ("Lambda Labs", "lambdalabs"),
+        "runpod": ("RunPod", "runpod"),
 
-        # Fintech
+        # Fintech & Crypto
         "stripe": ("Stripe", "stripe"),
         "coinbase": ("Coinbase", "coinbase"),
         "plaid": ("Plaid", "plaid"),
@@ -664,18 +665,33 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
         "brex": ("Brex", "brex"),
         "affirm": ("Affirm", "affirm"),
         "kraken": ("Kraken", "kraken"),
+        "ripple": ("Ripple", "ripple"),
 
-        # Big Tech
+        # Big Tech Pay Leaders
         "databricks": ("Databricks", "databricks"),
         "airbnb": ("Airbnb", "airbnb"),
         "pinterest": ("Pinterest", "pinterest"),
         "doordash": ("DoorDash", "doordash"),
         "uber": ("Uber", "uber"),
         "snowflake": ("Snowflake", "snowflake"),
+        "figma": ("Figma", "figma"),
+        "spotify": ("Spotify", "spotify"),
 
-        # Quant (some use Greenhouse)
+        # Infrastructure-as-Product
+        "hashicorp": ("HashiCorp", "hashicorp"),
+        "cloudflare": ("Cloudflare", "cloudflare"),
+        "confluent": ("Confluent", "confluent"),
+        "elastic": ("Elastic", "elastic"),
+        "mongodb": ("MongoDB", "mongodb"),
+        "datadog": ("Datadog", "datadog"),
+        "vercel": ("Vercel", "vercel"),
+        "supabase": ("Supabase", "supabase"),
+
+        # Quant (those using Greenhouse)
         "citadel": ("Citadel", "citadel"),
         "two_sigma": ("Two Sigma", "twosigma"),
+        "hudson_river": ("Hudson River Trading", "hudsonrivertrading"),
+        "five_rings": ("Five Rings Capital", "fiveringsmgmt"),
     }
 
     # Known Lever boards
@@ -686,6 +702,8 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
         "revolut": ("Revolut", "revolut"),
         "block": ("Block", "block"),
         "meta": ("Meta", "meta"),
+        "nvidia": ("NVIDIA", "nvidia"),
+        "dropbox": ("Dropbox", "dropbox"),
     }
 
     # Known Ashby boards (popular with AI startups)
@@ -696,6 +714,7 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
         "mistral_ai": ("Mistral AI", "mistralai"),
         "character_ai": ("Character.ai", "characterai"),
         "midjourney": ("Midjourney", "midjourney"),
+        "xai": ("xAI", "xai"),
     }
 
     if company_key in greenhouse_boards:

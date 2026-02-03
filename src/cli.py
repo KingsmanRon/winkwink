@@ -514,7 +514,7 @@ def cleanup(ctx, days):
 @cli.command()
 @click.option("--cv", type=click.Path(exists=True), help="Path to CV file for matching")
 @click.option("--companies", "-c", multiple=True, help="Specific companies to crawl")
-@click.option("--category", type=click.Choice(["ai", "quant", "fintech", "bigtech", "all"]), default="all", help="Company category")
+@click.option("--category", type=click.Choice(["ai", "quant", "fintech", "bigtech", "infra", "all"]), default="all", help="Company category")
 @click.option("--keywords", "-k", multiple=True, help="Filter by job title keywords")
 @click.pass_context
 def targets(ctx, cv, companies, category, keywords):
@@ -534,24 +534,35 @@ def targets(ctx, cv, companies, category, keywords):
 
     config = ctx.obj["config"]
 
-    # Define target companies by category
+    # Define target companies by category - Top 50 Highest Paying
     target_companies = {
         "ai": [
-            "anthropic", "openai", "scale_ai", "cohere", "anyscale",
-            "modal", "replicate", "together_ai", "perplexity", "mistral",
-            "databricks", "hugging_face"
+            # AI Compute Builders - HIGHEST DEMAND
+            "coreweave", "anthropic", "openai", "scale_ai", "databricks",
+            "anyscale", "together_ai", "modal", "replicate", "cohere",
+            "perplexity", "mistral", "hugging_face", "lambda_labs"
         ],
         "quant": [
-            "citadel", "two_sigma", "jane_street", "jump_trading",
-            "hudson_river", "optiver", "drw", "imc_trading"
+            # Cash Kings - $300k-$600k+ TC
+            "jane_street", "citadel", "hudson_river", "five_rings",
+            "jump_trading", "optiver", "drw", "tower_research",
+            "imc_trading", "akuna_capital", "xtx_markets", "two_sigma"
         ],
         "fintech": [
+            # Strong RSU/Cash blend
             "stripe", "coinbase", "plaid", "ramp", "brex",
-            "affirm", "kraken", "revolut", "block"
+            "affirm", "kraken", "revolut", "block", "ripple", "klarna"
         ],
         "bigtech": [
-            "netflix", "airbnb", "uber", "pinterest", "doordash",
-            "snowflake", "roblox", "meta"
+            # Pay Leaders - above standard FAANG bands
+            "netflix", "meta", "nvidia", "snowflake", "uber",
+            "airbnb", "pinterest", "doordash", "roblox", "databricks",
+            "figma", "spotify"
+        ],
+        "infra": [
+            # Infrastructure-as-Product companies
+            "hashicorp", "cloudflare", "confluent", "elastic",
+            "mongodb", "datadog", "vercel", "supabase"
         ]
     }
 
