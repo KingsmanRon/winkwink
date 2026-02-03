@@ -641,20 +641,14 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
 
     # Known Greenhouse boards - Top 50 high-paying companies
     greenhouse_boards = {
-        # AI Labs & Research
+        # AI Labs & Research (verified Greenhouse)
         "anthropic": ("Anthropic", "anthropic"),
         "openai": ("OpenAI", "openai"),
         "scale_ai": ("Scale AI", "scaleai"),
-        "cohere": ("Cohere", "cohere"),
         "hugging_face": ("Hugging Face", "huggingface"),
-
-        # AI Compute Infrastructure (HOT CATEGORY)
-        "anyscale": ("Anyscale", "anyscale"),
-        "modal": ("Modal", "modal"),
-        "replicate": ("Replicate", "replicate"),
-        "together_ai": ("Together AI", "togetherai"),
         "coreweave": ("CoreWeave", "coreweave"),
-        "lambda_labs": ("Lambda Labs", "lambdalabs"),
+        "lambda_labs": ("Lambda Labs", "lambda"),  # Note: 'lambda' not 'lambdalabs'
+        "anyscale": ("Anyscale", "anyscale"),
         "runpod": ("RunPod", "runpod"),
 
         # Fintech & Crypto
@@ -706,15 +700,22 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
         "dropbox": ("Dropbox", "dropbox"),
     }
 
-    # Known Ashby boards (popular with AI startups)
+    # Known Ashby boards (AI-native standard - many AI companies use Ashby)
     ashby_boards = {
+        # AI Companies using Ashby
         "perplexity": ("Perplexity AI", "perplexity"),
         "perplexity_ai": ("Perplexity AI", "perplexity"),
-        "mistral": ("Mistral AI", "mistralai"),
-        "mistral_ai": ("Mistral AI", "mistralai"),
+        "mistral": ("Mistral AI", "mistral"),  # 'mistral' not 'mistralai'
+        "mistral_ai": ("Mistral AI", "mistral"),
+        "cohere": ("Cohere", "cohere"),  # Moved from Greenhouse
+        "modal": ("Modal", "modal-labs"),  # Note: 'modal-labs' in API
+        "replicate": ("Replicate", "replicate"),  # Moved from Greenhouse
+        "together_ai": ("Together AI", "together"),  # Note: 'together' not 'togetherai'
         "character_ai": ("Character.ai", "characterai"),
         "midjourney": ("Midjourney", "midjourney"),
         "xai": ("xAI", "xai"),
+        "adept": ("Adept", "adept"),
+        "gentrace": ("Gentrace", "gentrace"),
     }
 
     if company_key in greenhouse_boards:
