@@ -627,35 +627,46 @@ class AshbyCrawler(BaseCrawler):
 
 
 # Remote-first company boards (for international candidates)
+# CORRECTED: Many companies switched to Ashby or have no public API
+
 REMOTE_FIRST_GREENHOUSE_BOARDS = {
     "gitlab": ("GitLab", "gitlab"),
     "grafana_labs": ("Grafana Labs", "grafanalabs"),
-    "zapier": ("Zapier", "zapier"),
     "dbt_labs": ("dbt Labs", "dbtlabsinc"),
-    "fly_io": ("Fly.io", "fly"),
+    "fly_io": ("Fly.io", "fly"),  # FIXED: "fly" not "flyio"
     "planetscale": ("PlanetScale", "planetscale"),
-    "sourcegraph": ("Sourcegraph", "sourcegraph"),
-    "linear": ("Linear", "linear"),
+    "sourcegraph": ("Sourcegraph", "sourcegraph91"),  # FIXED: "sourcegraph91" not "sourcegraph"
     "postman": ("Postman", "postman"),
-    "airbyte": ("Airbyte", "airbyte"),
-    "mux": ("Mux", "mux"),
     "retool": ("Retool", "retool"),
     "webflow": ("Webflow", "webflow"),
-    "notion": ("Notion", "notion"),
     "airtable": ("Airtable", "airtable"),
+    "posthog": ("PostHog", "posthog"),
+    "netlify": ("Netlify", "netlify"),
 }
 
+# REMOVED companies with no public API:
+# - automattic (uses internal p2 system)
+# - auth0 (now part of Okta)
+# - hotjar (switched ATS)
+# - loom (acquired by Atlassian)
+# - remote_com (uses internal system)
+# - deel (uses Workday/internal)
+# - oyster (no public API)
+# - airbyte (may use Workday)
+# - mux (check site directly)
 REMOTE_FIRST_LEVER_BOARDS = {
-    "automattic": ("Automattic", "automattic"),
-    "auth0": ("Auth0/Okta", "auth0"),
-    "hotjar": ("Hotjar", "hotjar"),
-    "loom": ("Loom", "loom"),
-    "remote_com": ("Remote.com", "remotecom"),
-    "deel": ("Deel", "deel"),
-    "oyster": ("Oyster HR", "oyster"),
+    # Most remote-first companies have moved away from Lever
+    # Keep only verified working boards
 }
 
 REMOTE_FIRST_ASHBY_BOARDS = {
+    # CORRECTED: Many dev tools now use Ashby
+    "zapier": ("Zapier", "zapier"),  # MOVED from Lever
+    "notion": ("Notion", "notion"),  # MOVED from Greenhouse
+    "linear": ("Linear", "Linear"),  # Capital L required
+    "vercel": ("Vercel", "vercel"),  # MOVED from Greenhouse
+    "supabase": ("Supabase", "supabase"),  # MOVED from Greenhouse
+    "railway": ("Railway", "railway"),
     "cal_com": ("Cal.com", "calcom"),
     "deno": ("Deno", "deno"),
 }
@@ -713,8 +724,7 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
         "elastic": ("Elastic", "elastic"),
         "mongodb": ("MongoDB", "mongodb"),
         "datadog": ("Datadog", "datadog"),
-        "vercel": ("Vercel", "vercel"),
-        "supabase": ("Supabase", "supabase"),
+        # NOTE: vercel and supabase moved to Ashby
 
         # Quant (those using Greenhouse)
         "citadel": ("Citadel", "citadel"),
@@ -735,22 +745,27 @@ def get_company_crawler(company_key: str, config: Optional[CrawlConfig] = None) 
         "dropbox": ("Dropbox", "dropbox"),
     }
 
-    # Known Ashby boards (AI-native standard - many AI companies use Ashby)
+    # Known Ashby boards (AI-native standard - many AI/dev tool companies use Ashby)
     ashby_boards = {
         # AI Companies using Ashby
         "perplexity": ("Perplexity AI", "perplexity"),
         "perplexity_ai": ("Perplexity AI", "perplexity"),
         "mistral": ("Mistral AI", "mistral"),  # 'mistral' not 'mistralai'
         "mistral_ai": ("Mistral AI", "mistral"),
-        "cohere": ("Cohere", "cohere"),  # Moved from Greenhouse
+        "cohere": ("Cohere", "cohere"),
         "modal": ("Modal", "modal-labs"),  # Note: 'modal-labs' in API
-        "replicate": ("Replicate", "replicate"),  # Moved from Greenhouse
+        "replicate": ("Replicate", "replicate"),
         "together_ai": ("Together AI", "together"),  # Note: 'together' not 'togetherai'
         "character_ai": ("Character.ai", "characterai"),
         "midjourney": ("Midjourney", "midjourney"),
         "xai": ("xAI", "xai"),
         "adept": ("Adept", "adept"),
         "gentrace": ("Gentrace", "gentrace"),
+
+        # Dev Tools (CORRECTED - moved from Greenhouse/Lever)
+        "vercel": ("Vercel", "vercel"),
+        "supabase": ("Supabase", "supabase"),
+        "railway": ("Railway", "railway"),
     }
 
     if company_key in greenhouse_boards:
