@@ -4,6 +4,7 @@ pyyaml>=6.0
 aiohttp>=3.8.0
 beautifulsoup4>=4.12.0
 lxml>=4.9.0
+Brotli>=1.1.0  # Required for some HTTP responses
 
 # PDF/Document parsing
 pymupdf>=1.23.0  # PyMuPDF for PDF parsing
