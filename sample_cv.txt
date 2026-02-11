@@ -1,0 +1,86 @@
+Ronald Qobolo
+Multi-Cloud Solutions Architect
+
+ronaldtrqobolo@outlook.com | Midrand, Johannesburg | 0670251312 | Linkedin Profile
+Languages: English, Afrikaans, Sesotho
+
+PROFESSIONAL EXPERIENCE
+
+Deloitte, Midrand, South Africa, November 2022 – Current
+Position: Lead Cloud Infrastructure Engineer
+- Server (Windows and Linux) Lift-and-Shift Migration for Goldfields Mining into AWS. Currently in the process of creating a migration and modernization roadmap for SQL databases hosted in AWS, to be moved into RDS
+- FinOps Consultant for MTN CcoE: Conducted Cost Assessment for Azure Kubernetes and provided assistance in driving costs down, based on usage and performance.
+- Infrastructure Stream Lead: Led a comprehensive architectural review of Debswana Mine's Azure infrastructure against the 5 pillars of the Azure Well-Architected Framework: identifying vulnerabilities and presenting actionable recommendations to client, covering security, optimization of resource allocation and Improved cost efficiency.
+- Cloud Architect and Developer: Co-led a cloud infrastructure stream (team of 4) to provision a Customer Data Platform (CDP) on Google Cloud Platform. I spearheaded key tasks: completing the ARB 1 & 2 Toolkit, architecting the CDP solution, and provisioning Google Cloud Artefacts using Terraform.
+- Data Migration: Collaborated in a team of four in a lift-and-shift data migration project using Azure Synapse Studio and SQL Server Management Studio.
+- Technical Leadership: Acted as a Subject Matter Expert (SME) for Azure cloud engineering, guiding teams on best practices and ensuring alignment with client standards.
+- Developer: Developed CRUD Operations in SQL and configured APIs using .NET for Project Levvia
+- Talent Acquisition: Participated in developer interviews, contributing to the Recruitment of skilled team members.
+
+BMW IT Hub, Pretoria, South Africa, July 2023 – February 2025
+Position: Advanced Azure Developer
+- Maintained a complex Azure environment for a predictive maintenance project, ensuring high availability and optimal performance for critical automotive shopfloor applications and updated architecture and terraform code for components like SEW DriveRadar security updates.
+- Provisioned and managed Azure cloud resources using Terraform.
+- Deployed applications via CI/CD pipelines in Azure DevOps.
+- Spearheaded and documented AzureRM and Terraform version upgrade for DEV, QA and Production Environment.
+- Optimized Azure Data Explorer (KQL) queries and migrated them to PostgreSQL which resulted in significant cost reductions based on usage and performance optimization.
+- Renewed and manage SSL Certificates using Cards System, ensuring secure communication across applications.
+- Collaborated with cross-functional teams to troubleshoot and resolve issues in Splunk and other monitoring tools.
+- Debugging an application (BMW ImageViewer) in Docker.
+- Ensuring Azure Environment Security Score was above 75% and implemented BMW Wiz Security Recommendations.
+
+First Technology Digital, Midrand, South Africa, January 2020 – October 2022
+Position: Intermediate Software Developer
+- Developed and maintained K2 applications for enterprise clients, managing environments across Dev, QA, and Production.
+- Designed and implemented custom Nintex Connectors in JSON format, ensuring seamless integration with client systems.
+- Enhanced internal systems using Angular, MVC, and Microsoft SQL, improving data accuracy and user experience.
+- Customized Dynamics 365 environments to meet business needs, including role-based access control and entity customization.
+
+EDUCATION & PROFESSIONAL CERTIFICATIONS
+
+Bachelor of Computing (Honours): Software Engineering
+Belgium Campus ITversity
+NQF Level 8
+
+Business Administration & Management (CBAM)
+The Business School of South Africa
+NQF Level 4
+
+HashiCorp:
+- Terraform Associate HCTA0-003
+
+AWS:
+- AWS Certified Solutions Architect – Associate
+- AWS Certified DevOps Engineer – Professional
+
+Microsoft Azure:
+- Azure Solutions Architect Expert (AZ-305)
+- Azure DevOps Engineer Expert (AZ-400)
+- Azure Developer Associate (AZ-204)
+- Azure Administrator Associate (AZ-104)
+- Azure Fundamentals (AZ-900)
+
+Google Cloud Platform (GCP):
+- Google Cloud Certified Professional Cloud Architect
+- Google Cloud Certified Professional Cloud DevOps Engineer
+- Google Cloud Certified Associate Cloud Engineer
+
+Other:
+- Scaled Agile Framework (SAFe 6 Practitioner)
+- Microsoft Dynamics 365 Fundamentals
+- Nintex RPA Expert, Nintex Process Automation Expert
+
+ACHIEVEMENTS
+- 2024 Sub Product Owner (BMW: Predima Americas)
+- 2023 Cloud Infrastructure Stream Lead (Deloitte)
+- 2021 Empire Partner Foundation Hackathon Winner
+- 2019 President of The Student Representative Counsel
+
+TRAITS:
+Adaptive, goal-driven, team player, passionate about problem-solving and self-development.
+
+INTERESTS:
+- AI/ML Infrastructure and MLOps
+- GPU cluster management
+- LLM deployment and serving
+- Open to learning and upskilling in AI infrastructure domain
