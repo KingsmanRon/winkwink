@@ -101,40 +101,62 @@ AI_ADJACENT_SIGNALS = [
 # Skill keyword mappings for matching
 SKILL_KEYWORDS = {
     # Cloud platforms
-    "aws": ["aws", "amazon web services", "ec2", "s3", "lambda", "cloudformation", "eks", "ecs", "rds"],
-    "azure": ["azure", "microsoft azure", "aks", "azure functions", "arm templates", "azure devops"],
-    "gcp": ["gcp", "google cloud", "gke", "bigquery", "cloud run", "cloud functions"],
+    "aws": ["aws", "amazon web services", "ec2", "s3", "lambda", "cloudformation", "eks", "ecs", "rds", "dynamodb", "sqs", "sns", "cloudwatch", "iam"],
+    "azure": ["azure", "microsoft azure", "aks", "azure functions", "arm templates", "azure devops", "azure ad", "azure monitor"],
+    "gcp": ["gcp", "google cloud", "gke", "bigquery", "cloud run", "cloud functions", "gcs", "pub/sub"],
+    "multi_cloud": ["multi-cloud", "multi cloud", "hybrid cloud", "cross-cloud"],
 
-    # Infrastructure
-    "kubernetes": ["kubernetes", "k8s", "helm", "kubectl", "container orchestration"],
-    "terraform": ["terraform", "hcl", "infrastructure as code", "iac"],
-    "docker": ["docker", "containers", "containerization"],
-    "ansible": ["ansible", "playbooks"],
+    # Infrastructure & Orchestration
+    "kubernetes": ["kubernetes", "k8s", "helm", "kubectl", "container orchestration", "eks", "aks", "gke", "openshift"],
+    "kubernetes_advanced": ["istio", "service mesh", "envoy", "linkerd", "cilium", "calico"],
+    "terraform": ["terraform", "hcl", "infrastructure as code", "iac", "terragrunt"],
+    "docker": ["docker", "containers", "containerization", "docker compose", "dockerfile"],
+    "ansible": ["ansible", "playbooks", "ansible tower", "awx"],
+    "pulumi": ["pulumi"],
 
-    # CI/CD
-    "cicd": ["ci/cd", "cicd", "continuous integration", "continuous deployment", "jenkins", "github actions", "gitlab ci"],
-    "gitops": ["gitops", "argocd", "flux"],
+    # CI/CD & GitOps
+    "cicd": ["ci/cd", "cicd", "continuous integration", "continuous deployment", "continuous delivery", "pipelines"],
+    "jenkins": ["jenkins", "jenkins pipelines", "jenkinsfile"],
+    "github_actions": ["github actions", "github workflows"],
+    "gitlab_ci": ["gitlab ci", "gitlab pipelines", "gitlab runner"],
+    "azure_devops": ["azure devops", "azure pipelines", "ado"],
+    "gitops": ["gitops", "argocd", "argo cd", "flux", "fluxcd"],
 
     # Programming
-    "python": ["python"],
-    "go": ["golang", "go lang"],
-    "javascript": ["javascript", "typescript", "node.js", "nodejs"],
+    "python": ["python", "python3"],
+    "go": ["golang", "go lang", "go programming"],
+    "javascript": ["javascript", "typescript", "node.js", "nodejs", "js"],
+    "bash": ["bash", "shell", "shell scripting", "linux"],
+    "java": ["java", "jvm"],
 
     # Databases
-    "sql": ["sql", "postgresql", "mysql", "database"],
-    "nosql": ["nosql", "mongodb", "dynamodb", "redis"],
+    "sql": ["sql", "postgresql", "postgres", "mysql", "database", "rds"],
+    "nosql": ["nosql", "mongodb", "dynamodb", "redis", "cassandra", "elasticsearch"],
 
-    # Monitoring
-    "monitoring": ["monitoring", "observability", "prometheus", "grafana", "datadog", "splunk"],
+    # Monitoring & Observability
+    "monitoring": ["monitoring", "observability", "apm", "tracing"],
+    "prometheus": ["prometheus", "promql"],
+    "grafana": ["grafana", "dashboards"],
+    "datadog": ["datadog"],
+    "elk": ["elk", "elastic", "elasticsearch", "logstash", "kibana", "opensearch"],
+    "splunk": ["splunk"],
 
     # Cloud Security (infrastructure-relevant)
-    "cloud_security": ["cloud security", "devsecops", "compliance", "soc2", "pci", "iam", "secrets management", "vault", "zero trust"],
+    "cloud_security": ["cloud security", "devsecops", "compliance", "soc2", "pci", "pci-dss", "gdpr", "hipaa", "iam", "secrets management", "vault", "zero trust"],
 
     # Security Engineering (specialized security roles - different domain)
     "security_engineering": ["penetration testing", "red team", "blue team", "threat hunting", "malware analysis", "security operations", "soc analyst", "incident response", "threat intelligence", "forensics"],
 
-    # Architecture
-    "architecture": ["architecture", "system design", "distributed systems", "microservices"],
+    # Architecture & Design
+    "architecture": ["architecture", "system design", "distributed systems", "microservices", "event-driven"],
+    "solutions_architect": ["solutions architect", "cloud architect", "enterprise architect"],
+    "high_availability": ["high availability", "disaster recovery", "dr", "rpo", "rto", "fault tolerance", "resilience"],
+
+    # AI/ML Infrastructure (target domain)
+    "mlops": ["mlops", "ml ops", "machine learning operations", "model deployment"],
+    "ai_infrastructure": ["ai infrastructure", "ml infrastructure", "gpu", "cuda", "nvidia", "training infrastructure", "inference"],
+    "ml_platforms": ["kubeflow", "mlflow", "sagemaker", "vertex ai", "ray", "vllm", "triton"],
+    "llm_infra": ["llm", "large language model", "model serving", "transformers", "inference optimization"],
 }
 
 # Company priority levels

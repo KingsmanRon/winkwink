@@ -354,12 +354,15 @@ class CVParser:
                 continue
             # Skip lines that are clearly not names (contain common CV words)
             skip_words = ["resume", "cv", "curriculum", "vitae", "profile", "summary",
-                         "experience", "education", "skills", "contact", "email", "phone"]
+                         "experience", "education", "skills", "contact", "email", "phone",
+                         "engineer", "architect", "developer", "manager", "lead", "senior",
+                         "junior", "principal", "staff", "cloud", "multi"]
             if any(word in line.lower() for word in skip_words):
                 continue
-            # Name should be mostly letters and spaces
-            if re.match(r"^[A-Za-z\s\-\'\.]+$", line) and len(line.split()) <= 4:
-                return line
+            # Name should be mostly letters and spaces, allow uppercase
+            if re.match(r"^[A-Za-z\s\-\'\.]+$", line, re.IGNORECASE) and len(line.split()) <= 4:
+                # Normalize case (handle all-caps names)
+                return line.title() if line.isupper() else line
 
         return ""
 
@@ -447,9 +450,11 @@ class CVParser:
         # Look for explicit mentions
         patterns = [
             r"(\d+)\+?\s*years?\s*(?:of\s+)?(?:professional\s+)?experience",
+            r"with\s+(\d+)\+?\s*years?\s*(?:of\s+)?experience",
             r"experience[:\s]+(\d+)\+?\s*years?",
             r"over\s+(\d+)\s*years?",
             r"(\d+)\+?\s*years?\s*in\s+(?:it|tech|software|cloud)",
+            r"(\d+)\+?\s*years?\s*(?:of\s+)?(?:designing|building|implementing|developing)",
         ]
 
         for pattern in patterns:
@@ -460,10 +465,18 @@ class CVParser:
                 except (ValueError, IndexError):
                     pass
 
-        # Try to calculate from date ranges
+        # Try to calculate from date ranges (work history)
         years = self._calculate_years_from_dates(text)
         if years > 0:
             return years
+
+        # Fallback: count years from job history date ranges
+        date_range_pattern = r"(\d{4})\s*[-–]\s*(?:present|\d{4})"
+        matches = re.findall(date_range_pattern, text_lower)
+        if matches:
+            earliest = min(int(y) for y in matches)
+            from datetime import datetime
+            return datetime.now().year - earliest
 
         return 0
 
@@ -486,6 +499,21 @@ class CVParser:
     def _extract_current_title(self, text: str) -> str:
         """Extract current job title."""
         text_lower = text.lower()
+        lines = text.strip().split("\n")
+
+        # Check first few lines for title (usually right after name)
+        title_keywords = ["architect", "engineer", "developer", "manager", "lead",
+                         "consultant", "analyst", "specialist", "administrator", "devops",
+                         "sre", "platform", "infrastructure", "cloud", "solutions"]
+        for line in lines[1:6]:  # Skip first line (name), check next 5
+            line_clean = line.strip()
+            line_lower = line_clean.lower()
+            if any(kw in line_lower for kw in title_keywords):
+                # Skip if it's a section header
+                if line_lower in ["experience", "skills", "education", "certifications"]:
+                    continue
+                if len(line_clean) < 60:  # Reasonable title length
+                    return line_clean.title() if line_clean.isupper() else line_clean
 
         # Check for explicit current title patterns
         title_patterns = [
