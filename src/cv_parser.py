@@ -471,7 +471,7 @@ class CVParser:
             return years
 
         # Fallback: count years from job history date ranges
-        date_range_pattern = r"(\d{4})\s*[-–]\s*(?:present|\d{4})"
+        date_range_pattern = r"(\d{4})\s*[-–]\s*(?:present|current|\d{4})"
         matches = re.findall(date_range_pattern, text_lower)
         if matches:
             earliest = min(int(y) for y in matches)
