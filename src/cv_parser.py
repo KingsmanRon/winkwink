@@ -482,8 +482,8 @@ class CVParser:
 
     def _calculate_years_from_dates(self, text: str) -> int:
         """Calculate years of experience from date ranges in CV."""
-        # Find all year mentions
-        year_pattern = r"\b(19|20)\d{2}\b"
+        # Find all year mentions (capture full 4-digit year)
+        year_pattern = r"\b((?:19|20)\d{2})\b"
         years = [int(y) for y in re.findall(year_pattern, text)]
 
         if len(years) >= 2:
